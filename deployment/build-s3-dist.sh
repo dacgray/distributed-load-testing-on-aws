@@ -145,7 +145,14 @@ cd $source_dir/console
 [ -e build ] && rm -r build
 [ -e node_modules ] && rm -rf node_modules
 npm install
-npm run build
+unameOut="$(uname -s)"
+case "${unameOut}" in
+    Linux*)     npm run build;;
+    Darwin*)    npm run build;;
+    CYGWIN*)    npm run winBuild;;
+    MINGW*)     npm run winBuild;;
+    *)          npm run build
+esac
 mkdir $build_dist_dir/console
 cp -r ./build/* $build_dist_dir/console/
 

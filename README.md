@@ -80,6 +80,7 @@ export VERSION=my-version # version number for the customized code
 The CloudFormation template is configured to pull the Lambda deployment packages from Amazon S3 bucket in the region the template is being launched in. Create a bucket in the desired region with the region name appended to the name of the bucket. eg: for us-east-1 create a bucket named: ```my-bucket-us-east-1```
 ```bash
 aws s3 mb s3://$DIST_OUTPUT_BUCKET-$REGION --region $REGION
+aws s3 mb s3://dlt-ap-southeast-1 --region ap-southeast-1
 ```
 
 ### 5. Create the deployment packages
@@ -87,6 +88,7 @@ Build the distributable:
 ```bash
 chmod +x ./build-s3-dist.sh
 ./build-s3-dist.sh $DIST_OUTPUT_BUCKET $SOLUTION_NAME $VERSION
+./build-s3-dist.sh dlt cf-dlt v1.0.0
 ```
 
 > **Notes**: The _build-s3-dist_ script expects the bucket name as one of its parameters, and this value should not include the region suffix. In addition to that, the version parameter will be used to tag the npm packages, and therefore should be in the [Semantic Versioning format](https://semver.org/spec/v2.0.0.html).
@@ -96,6 +98,9 @@ Deploy the distributable to the Amazon S3 bucket in your account:
 ```bash
 aws s3 cp ./regional-s3-assets/ s3://$DIST_OUTPUT_BUCKET-$REGION/$SOLUTION_NAME/$VERSION/ --recursive --acl bucket-owner-full-control
 aws s3 cp ./global-s3-assets/ s3://$DIST_OUTPUT_BUCKET-$REGION/$SOLUTION_NAME/$VERSION/ --recursive --acl bucket-owner-full-control
+
+aws s3 cp ./regional-s3-assets/ s3://dlt-ap-southeast-1/cf-dlt/v1.0.0/ --recursive --acl bucket-owner-full-control
+aws s3 cp ./global-s3-assets/ s3://dlt-ap-southeast-1/cf-dlt/v1.0.0/ --recursive --acl bucket-owner-full-control
 ```
 
 ### 7. Launch the CloudFormation template.
